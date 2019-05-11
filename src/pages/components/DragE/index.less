@@ -1,0 +1,28 @@
+.divList {
+    display: flex;
+    flex-wrap: wrap;
+    &>li {
+        width: 50%;
+        height: 450px;
+        text-align: center;
+        line-height: 450px;
+        font-size: 48px;
+        &.green {
+            background: #bee287;
+        }
+        &.red {
+            background: #fb9c9c;
+        }
+        &.blue {
+            background: #8585f7;
+        }
+        &.setMoveable {
+            position: relative;
+            box-shadow: 0 0 5px #666;
+            z-index: 999;
+            transition: all 150ms ease-in-out;
+            cursor: move;
+        }
+    }
+
+}
