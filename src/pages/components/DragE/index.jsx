@@ -25,17 +25,18 @@ class DragEDemo extends React.Component {
         this.domIdx = null; // 移动的dom的下标
         this.targetDomIdx = null; // 目标dom的下标
         this.isMoved = false; // 是否移动了位子
+        this.startTime = null;
     }
     // 鼠标按钮点击下后触发
     mouseDown = e => {
         this.dom = e.target;
-        const start = new Date().getTime();
+        this.startTime = new Date().getTime();
         // 鼠标按下后，清除设置data的timer
         clearTimeout(this.setDataTimer);
         this.timer = setInterval(() => {
             const now = new Date().getTime();
             // 如果现在的时间和按下屏幕时的时间相差大于300ms，则置为
-            if (now - start > 300) {
+            if (now - this.startTime > 300) {
                 // 增加moveable效果
                 this.dom.classList.add(styles.setMoveable);
                 // 设置draggable属性
@@ -49,6 +50,11 @@ class DragEDemo extends React.Component {
     }
     // 鼠标按钮松开
     mouseUp = () => {
+        const now = new Date().getTime();
+        if (now - this.startTime <= 100) {
+            // click event here
+            console.log('click');
+        }
         // 移除moveable效果
         this.dom.classList.remove(styles.setMoveable);
         // 移除draggable属性
