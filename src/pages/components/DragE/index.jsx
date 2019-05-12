@@ -29,10 +29,14 @@ class DragEDemo extends React.Component {
     }
     // 鼠标按钮点击下后触发
     mouseDown = e => {
-        this.dom = e.target;
+        if (e.button !== 0) {
+            return;
+        }
+        this.dom = this.findTopDom(e.target);
         this.startTime = new Date().getTime();
         // 鼠标按下后，清除设置data的timer
         clearTimeout(this.setDataTimer);
+        this.setDataTimer = null;
         this.timer = setInterval(() => {
             const now = new Date().getTime();
             // 如果现在的时间和按下屏幕时的时间相差大于300ms，则置为
@@ -40,7 +44,7 @@ class DragEDemo extends React.Component {
                 // 增加moveable效果
                 this.dom.classList.add(styles.setMoveable);
                 // 设置draggable属性
-                this.dom.setAttribute('draggable', true);
+                // this.dom.setAttribute('draggable', true);
                 // 清除timer
                 clearInterval(this.timer);
                 // 给dom绑定事件
@@ -58,7 +62,7 @@ class DragEDemo extends React.Component {
         // 移除moveable效果
         this.dom.classList.remove(styles.setMoveable);
         // 移除draggable属性
-        this.dom.setAttribute('draggable', false);
+        // this.dom.setAttribute('draggable', false);
         // 清楚timer
         clearInterval(this.timer);
         // 取消dom绑定事件
@@ -67,6 +71,7 @@ class DragEDemo extends React.Component {
         // 这里做比较操作，重新定义state.data, debounce处理，1s后执行，如果1s重复触发，则清除timeout
         if (this.isMoved) {
             this.setDataTimer = setTimeout(() => {
+                console.log('reset data');
                 // 重置state.data
                 this.resetData();
                 // dom滞空
@@ -77,9 +82,9 @@ class DragEDemo extends React.Component {
     }
     // 元素拖动start
     dragStart = e => {
-        console.log('dragStart');
-        this.dom.style.opacity = '0';
-        const parentNode = e.target.parentNode.childNodes;
+        // this.dom.style.opacity = '0';
+        const target = this.findTopDom(e.target);
+        const parentNode = target.parentNode.childNodes;
         const domIdx = this.getNodeIndexInNodeList(parentNode, e.target);
         this.domIdx = domIdx;
     }
@@ -90,24 +95,25 @@ class DragEDemo extends React.Component {
     // 元素拖动结束
     dragEnd = e => {
         e.preventDefault();
-        this.dom.style.opacity = '1';
+        // this.dom.style.opacity = '1';
         // 重置li样式
         this.mouseUp();
     }
     // 进入目标dom
     // 目前只考虑，单个替换
     dragEnter = e => {
+        e.preventDefault();
         // 获取当前目标元素的父元素
         this.moveElement(e);
     }
     // 离开目标dom
-    dragLeave = () => {
+    dragLeave = e => {
+        e.preventDefault();
         // code
     }
     // 放置于目标dom
     dropElement = e => {
         e.preventDefault();
-        console.log(e.target);
         // 移动dom
         this.movedElement(e);
     }
@@ -115,7 +121,7 @@ class DragEDemo extends React.Component {
         // 获取移动的dragged
         const dragged = this.dom;
         // 获取目标dom
-        const target = e.target;
+        const target = this.findTopDom(e.target);
         // 获取父节点的所有nodeList
         const parentNode = target.parentNode;
         // 获取父元素下的全部子元素
@@ -143,7 +149,7 @@ class DragEDemo extends React.Component {
         // 获取移动的dragged
         const dragged = this.dom;
         // 获取目标dom
-        const target = e.target;
+        const target = this.findTopDom(e.target);
         // 获取父节点的所有nodeList
         const parentNode = target.parentNode;
         // 获取父元素下的全部子元素
@@ -218,6 +224,24 @@ class DragEDemo extends React.Component {
         }
         return index;
     }
+    // 向上寻找target这个父dom
+    // 默认向上寻找LI这个父dom
+    findTopDom(dom, target = 'LI') {
+        if (dom.tagName === 'LI') {
+            return dom;
+        }
+        let targetDom = null;
+        const findTarget = (tg) => {
+            const tagName = tg.tagName;
+            if (tagName !== target) {
+                findTarget(tg.parentNode);
+            } else {
+                targetDom = tg;
+            }
+        };
+        findTarget(dom);
+        return targetDom;
+    }
     componentDidMount() {
         this.bindDragEvent(fatherDom.current);
     }
@@ -225,7 +249,6 @@ class DragEDemo extends React.Component {
         this.unBindDragEvent(fatherDom.current);
     }
     render() {
-        console.log(this.state.data);
         return (
             <div
                 className={styles.divList}
@@ -238,7 +261,12 @@ class DragEDemo extends React.Component {
                             onMouseUp={this.mouseUp}
                             className={`${styles[item.color]} liZone_${item.id}`}
                             key={'li_' + item.id}
-                        >{item.id}</li>
+                            draggable="true"
+                        >
+                            <div draggable="false">
+                                {item.id}
+                            </div>
+                        </li>
                     )
                 }
             </div>
