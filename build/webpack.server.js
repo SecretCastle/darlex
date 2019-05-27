@@ -4,7 +4,7 @@ const router = express.Router();
 const webpack = require('webpack');
 const WebpackDevMiddleware = require('webpack-dev-middleware');
 const app = express();
-const path = require('path');
+
 const Config = require('../config');
 const ProxyUrl = Config.proxyUrl;
 const Proxy = require('./proxy');

@@ -18,8 +18,8 @@ class EditorDemo extends React.Component {
         return (
             <div style={styles.wrapper}>
                 <Editor onTextChange={this.textChange}/>
-            </div>
 
+            </div>
         );
     }
 }
