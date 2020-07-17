@@ -96,7 +96,7 @@
         "not ie <= 8"
     ],
     "dependencies": {
-        "lodash": "^4.17.11",
+        "lodash": "^4.17.19",
         "prop-types": "^15.7.2",
         "quill": "^1.3.6",
         "react": "^16.8.6",
